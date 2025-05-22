@@ -7,18 +7,18 @@ category_bp = Blueprint('category', __name__)
 def all_categories():
     return get_categories()
 
-@category_bp.route('/<int:id_category>', methods=['GET'])
-def category_by_id(id_category):
-    return get_category_by_id(id_category)
+@category_bp.route('/<uuid:category_id>', methods=['GET'])
+def category_by_id(category_id):
+    return get_category_by_id(category_id)
 
 @category_bp.route('/', methods=['POST'])
 def add_category():
     return create_category()
 
-@category_bp.route('/<int:id_category>', methods=['PUT'])
-def modify_category(id_category):
-    return update_category(id_category)
+@category_bp.route('/<uuid:category_id>', methods=['PUT'])
+def modify_category(category_id):
+    return update_category(category_id)
 
-@category_bp.route('/<int:id_category>', methods=['DELETE'])
-def remove_category(id_category):
-    return delete_category(id_category)
+@category_bp.route('/<uuid:category_id>', methods=['DELETE'])
+def remove_category(category_id):
+    return delete_category(category_id)

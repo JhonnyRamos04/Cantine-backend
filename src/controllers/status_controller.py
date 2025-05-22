@@ -1,5 +1,6 @@
 from flask import jsonify, request
 from src.models.status import Status, db
+import uuid
 
 def get_status():
     """Get all status records"""
@@ -10,10 +11,10 @@ def get_status():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def get_status_by_id(id_status):
+def get_status_by_id(status_id):
     """Get a status by ID"""
     try:
-        status = Status.query.get(id_status)
+        status = Status.query.get(status_id)
         if status:
             return jsonify(status.to_dict())
         return jsonify({"message": "Status not found"}), 404
@@ -32,6 +33,7 @@ def create_status():
             
         # Create new status
         new_status = Status(
+            status_id=uuid.uuid4(),
             name=data['name'],
             description=data.get('description')
         )
@@ -51,10 +53,10 @@ def create_status():
 
 # ==================== Status PUT Controller ====================
 
-def update_status(id_status):
+def update_status(status_id):
     """Update an existing status"""
     try:
-        status = Status.query.get(id_status)
+        status = Status.query.get(status_id)
         if not status:
             return jsonify({"error": "Status not found"}), 404
             
@@ -80,15 +82,15 @@ def update_status(id_status):
         return jsonify({"error": str(e)}), 500
     
 # ==================== Status DELETE Controller ====================
-def delete_status(id_status):
+def delete_status(status_id):
     """Delete a status"""
     try:
-        status = Status.query.get(id_status)
+        status = Status.query.get(status_id)
         if not status:
             return jsonify({"error": "Status not found"}), 404
             
         # Check if status is being used
-        if status.menus or status.tables or status.orders:
+        if status.dishes:
             return jsonify({"error": "Cannot delete status that is in use"}), 400
             
         db.session.delete(status)

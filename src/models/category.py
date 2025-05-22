@@ -8,8 +8,8 @@ class Category(db.Model):
     description = db.Column(db.Text)
     
     # Relaciones
-    products = db.relationship('Product', backref='category', lazy=True)
-    dishes = db.relationship('Dish', backref='category', lazy=True)
+    products = db.relationship('Product', back_populates='category', lazy=True)
+    dishes = db.relationship('Dish', back_populates='category', lazy=True)
 
     def __repr__(self):
         return f'<Category id={self.category_id}, name={self.name}>'

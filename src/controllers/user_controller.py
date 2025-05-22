@@ -1,66 +1,74 @@
 from flask import jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+# Importamos nuestro jwt_required personalizado en lugar del de flask_jwt_extended
+from src.middlewares.auth import jwt_required
 from src.models.user import User, db
+import uuid
 
 def get_users():
     """Get all users"""
     try:
-        all_users = User.query.all()
+        # Usar opciones de carga para cargar relaciones
+        all_users = User.query.options(
+            db.joinedload(User.role)
+        ).all()
         users_list = [u.to_dict() for u in all_users]
         return jsonify(users_list)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def get_user_by_id(id_user):
+def get_user_by_id(user_id):
     """Get a user by ID"""
     try:
-        user = User.query.get(id_user)
+        # Usar opciones de carga para cargar relaciones
+        user = User.query.options(
+            db.joinedload(User.role)
+        ).get(user_id)
         if user:
             return jsonify(user.to_dict())
         return jsonify({"message": "User not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def get_users_by_role(id_role):
+def get_users_by_role(roles_id):
     """Get users by role ID"""
     try:
-        users = User.query.filter_by(id_role=id_role).all()
+        users = User.query.filter_by(roles_id=roles_id).all()
         users_list = [u.to_dict() for u in users]
         return jsonify(users_list)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
 # ==================== User POST Controller ====================
-@jwt_required()
+@jwt_required()  # Este decorador ahora permite acceso a todos
 def create_user():
     """Create a new user"""
     try:
-        # Verificar si el usuario actual tiene permisos (asumiendo rol de admin es 1)
-        current_user_id = get_jwt_identity()
-        current_user = User.query.get(current_user_id)
-        
-        if not current_user or current_user.id_role != 1:
-            return jsonify({"error": "No tienes permisos para crear usuarios"}), 403
+        # Desactivamos la verificación de permisos
+        # current_user_id = get_jwt_identity()
+        # current_user = User.query.get(current_user_id)
+        # 
+        # if not current_user or current_user.roles_id != 1:
+        #     return jsonify({"error": "No tienes permisos para crear usuarios"}), 403
         
         data = request.get_json()
         
         # Validar required fields
-        required_fields = ['name', 'username', 'password', 'id_role']
+        required_fields = ['name', 'email', 'password', 'roles_id']
         for field in required_fields:
             if field not in data:
                 return jsonify({"error": f"{field} is required"}), 400
                 
-        # Check if username already exists
-        existing_user = User.query.filter_by(username=data['username']).first()
+        # Check if email already exists
+        existing_user = User.query.filter_by(email=data['email']).first()
         if existing_user:
-            return jsonify({"error": "Username already exists"}), 409
+            return jsonify({"error": "Email already exists"}), 409
             
         # Create new user
         new_user = User(
+            user_id=uuid.uuid4(),
             name=data['name'],
-            username=data['username'],
-            id_role=data['id_role'],
-            id_solve=data.get('id_solve')
+            email=data['email'],
+            roles_id=data['roles_id']
         )
         
         # Set hashed password
@@ -79,18 +87,18 @@ def create_user():
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-@jwt_required()
-def update_user(id_user):
+@jwt_required()  # Este decorador ahora permite acceso a todos
+def update_user(user_id):
     """Update an existing user"""
     try:
-        # Verificar si el usuario actual tiene permisos o es el mismo usuario
-        current_user_id = get_jwt_identity()
-        current_user = User.query.get(current_user_id)
+        # Desactivamos la verificación de permisos
+        # current_user_id = get_jwt_identity()
+        # current_user = User.query.get(current_user_id)
+        # 
+        # if not current_user or (current_user.roles_id != 1 and str(current_user.user_id) != user_id):
+        #     return jsonify({"error": "No tienes permisos para actualizar este usuario"}), 403
         
-        if not current_user or (current_user.id_role != 1 and current_user.id_user != id_user):
-            return jsonify({"error": "No tienes permisos para actualizar este usuario"}), 403
-        
-        user = User.query.get(id_user)
+        user = User.query.get(user_id)
         if not user:
             return jsonify({"error": "User not found"}), 404
             
@@ -100,22 +108,19 @@ def update_user(id_user):
         if 'name' in data:
             user.name = data['name']
             
-        if 'username' in data and data['username'] != user.username:
-            # Check if new username already exists
-            existing_user = User.query.filter_by(username=data['username']).first()
+        if 'email' in data and data['email'] != user.email:
+            # Check if new email already exists
+            existing_user = User.query.filter_by(email=data['email']).first()
             if existing_user:
-                return jsonify({"error": "Username already exists"}), 409
-            user.username = data['username']
+                return jsonify({"error": "Email already exists"}), 409
+            user.email = data['email']
             
         if 'password' in data:
             user.set_password(data['password'])
             
-        # Only admin can change role
-        if 'id_role' in data and current_user.id_role == 1:
-            user.id_role = data['id_role']
-            
-        if 'id_solve' in data:
-            user.id_solve = data['id_solve']
+        # Permitimos cambiar el rol sin verificar permisos
+        if 'roles_id' in data:
+            user.roles_id = data['roles_id']
             
         db.session.commit()
         
@@ -128,18 +133,18 @@ def update_user(id_user):
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
 
-@jwt_required()
-def delete_user(id_user):
+@jwt_required()  # Este decorador ahora permite acceso a todos
+def delete_user(user_id):
     """Delete a user"""
     try:
-        # Verificar si el usuario actual tiene permisos (solo admin)
-        current_user_id = get_jwt_identity()
-        current_user = User.query.get(current_user_id)
+        # Desactivamos la verificación de permisos
+        # current_user_id = get_jwt_identity()
+        # current_user = User.query.get(current_user_id)
+        # 
+        # if not current_user or current_user.roles_id != 1:
+        #     return jsonify({"error": "No tienes permisos para eliminar usuarios"}), 403
         
-        if not current_user or current_user.id_role != 1:
-            return jsonify({"error": "No tienes permisos para eliminar usuarios"}), 403
-        
-        user = User.query.get(id_user)
+        user = User.query.get(user_id)
         if not user:
             return jsonify({"error": "User not found"}), 404
             

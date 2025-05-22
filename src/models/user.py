@@ -22,9 +22,21 @@ class User(db.Model):
         return check_password_hash(self.password, password)
     
     def to_dict(self):
+        role_info = None
+        
+        if self.roles_id:
+            rol = self.role
+            if rol:
+                role_info = {
+                    'roles_id': str(rol.roles_id),
+                    'name': rol.name,
+                    'description': rol.description
+                }
+        
         return {
             'user_id': str(self.user_id),
             'name': self.name,
             'email': self.email,
-            'roles_id': str(self.roles_id)
+            'roles_id': str(self.roles_id),
+            'role': role_info
         }

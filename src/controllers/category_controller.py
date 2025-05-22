@@ -1,5 +1,6 @@
 from flask import jsonify, request
 from src.models.category import Category, db
+import uuid
 
 def get_categories():
     """Get all categories"""
@@ -10,16 +11,16 @@ def get_categories():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def get_category_by_id(id_category):
+def get_category_by_id(category_id):
     """Get a category by ID"""
     try:
-        category = Category.query.get(id_category)
+        category = Category.query.get(category_id)
         if category:
             return jsonify(category.to_dict())
         return jsonify({"message": "Category not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
 # ==================== Category POST Controller ====================
 def create_category():
     """Create a new category"""
@@ -32,9 +33,9 @@ def create_category():
             
         # Create new category
         new_category = Category(
+            category_id=uuid.uuid4(),
             name=data['name'],
-            description=data.get('description'),
-            image_url=data.get('image_url')
+            description=data.get('description')
         )
         
         # Add to database
@@ -52,10 +53,10 @@ def create_category():
 
 # ==================== Category PUT Controller ====================
 
-def update_category(id_category):
+def update_category(category_id):
     """Update an existing category"""
     try:
-        category = Category.query.get(id_category)
+        category = Category.query.get(category_id)
         if not category:
             return jsonify({"error": "Category not found"}), 404
             
@@ -68,8 +69,6 @@ def update_category(id_category):
             category.name = data['name']
         if 'description' in data:
             category.description = data['description']
-        if 'image_url' in data:
-            category.image_url = data['image_url']
             
         db.session.commit()
         
@@ -81,19 +80,18 @@ def update_category(id_category):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
-
+    
 # ==================== Category DELETE Controller ====================
-
-def delete_category(id_category):
+def delete_category(category_id):
     """Delete a category"""
     try:
-        category = Category.query.get(id_category)
+        category = Category.query.get(category_id)
         if not category:
             return jsonify({"error": "Category not found"}), 404
             
         # Check if category is being used
-        if category.menus:
-            return jsonify({"error": "Cannot delete category that has menu items"}), 400
+        if category.products or category.dishes:
+            return jsonify({"error": "Cannot delete category that is in use"}), 400
             
         db.session.delete(category)
         db.session.commit()

@@ -7,9 +7,8 @@ class DishDetail(db.Model):
     description = db.Column(db.Text)
     price = db.Column(db.Numeric(10, 2))
     
-    # Relaciones
-    dishes = db.relationship('Dish', backref='dish_detail', lazy=True)
-
+    # No hay una relación directa con dishes según los inserts SQL
+    
     def __repr__(self):
         return f'<DishDetail id={self.dishes_details_id}, price={self.price}>'
     

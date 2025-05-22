@@ -7,18 +7,18 @@ role_bp = Blueprint('role', __name__)
 def all_roles():
     return get_roles()
 
-@role_bp.route('/<int:id_role>', methods=['GET'])
-def role_by_id(id_role):
-    return get_role_by_id(id_role)
+@role_bp.route('/<uuid:roles_id>', methods=['GET'])
+def role_by_id(roles_id):
+    return get_role_by_id(roles_id)
 
 @role_bp.route('/', methods=['POST'])
 def add_role():
     return create_role()
 
-@role_bp.route('/<int:id_role>', methods=['PUT'])
-def modify_role(id_role):
-    return update_role(id_role)
+@role_bp.route('/<uuid:roles_id>', methods=['PUT'])
+def modify_role(roles_id):
+    return update_role(roles_id)
 
-@role_bp.route('/<int:id_role>', methods=['DELETE'])
-def remove_role(id_role):
-    return delete_role(id_role)
+@role_bp.route('/<uuid:roles_id>', methods=['DELETE'])
+def remove_role(roles_id):
+    return delete_role(roles_id)

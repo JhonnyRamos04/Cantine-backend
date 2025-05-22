@@ -7,18 +7,18 @@ status_bp = Blueprint('status', __name__)
 def all_status():
     return get_status()
 
-@status_bp.route('/<int:id_status>', methods=['GET'])
-def status_by_id(id_status):
-    return get_status_by_id(id_status)
+@status_bp.route('/<uuid:status_id>', methods=['GET'])
+def status_by_id(status_id):
+    return get_status_by_id(status_id)
 
 @status_bp.route('/', methods=['POST'])
 def add_status():
     return create_status()
 
-@status_bp.route('/<int:id_status>', methods=['PUT'])
-def modify_status(id_status):
-    return update_status(id_status)
+@status_bp.route('/<uuid:status_id>', methods=['PUT'])
+def modify_status(status_id):
+    return update_status(status_id)
 
-@status_bp.route('/<int:id_status>', methods=['DELETE'])
-def remove_status(id_status):
-    return delete_status(id_status)
+@status_bp.route('/<uuid:status_id>', methods=['DELETE'])
+def remove_status(status_id):
+    return delete_status(status_id)

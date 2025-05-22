@@ -9,7 +9,9 @@ class Product(db.Model):
     category_id = db.Column(db.UUID, db.ForeignKey('category.category_id'))
     
     # Relaciones
-    dishes = db.relationship('Dish', backref='product', lazy=True)
+    dishes = db.relationship('Dish', back_populates='product', lazy=True)
+    product_detail = db.relationship('ProductDetail', back_populates='products', lazy=True)
+    category = db.relationship('Category', back_populates='products', lazy=True)
 
     def __repr__(self):
         return f'<Product id={self.products_id}, name={self.name}>'

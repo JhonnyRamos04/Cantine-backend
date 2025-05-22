@@ -8,7 +8,7 @@ class Role(db.Model):
     description = db.Column(db.Text)
     
     # Relaciones
-    users = db.relationship('User', backref='role', lazy=True)
+    users = db.relationship('User', backref='role', lazy='joined')
 
     def __repr__(self):
         return f'<Role id={self.roles_id}, name={self.name}>'
@@ -17,5 +17,6 @@ class Role(db.Model):
         return {
             'roles_id': str(self.roles_id),
             'name': self.name,
-            'description': self.description
+            'description': self.description,
+            'users_count': len(self.users) if self.users else 0
         }

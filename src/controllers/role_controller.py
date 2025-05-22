@@ -1,5 +1,6 @@
 from flask import jsonify, request
 from src.models.role import Role, db
+import uuid
 
 def get_roles():
     """Get all roles"""
@@ -10,10 +11,10 @@ def get_roles():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def get_role_by_id(id_role):
+def get_role_by_id(roles_id):
     """Get a role by ID"""
     try:
-        role = Role.query.get(id_role)
+        role = Role.query.get(roles_id)
         if role:
             return jsonify(role.to_dict())
         return jsonify({"message": "Role not found"}), 404
@@ -32,6 +33,7 @@ def create_role():
             
         # Create new role
         new_role = Role(
+            roles_id=uuid.uuid4(),
             name=data['name'],
             description=data.get('description')
         )
@@ -51,10 +53,10 @@ def create_role():
 
 # ==================== Role PUT Controller ====================
 
-def update_role(id_role):
+def update_role(roles_id):
     """Update an existing role"""
     try:
-        role = Role.query.get(id_role)
+        role = Role.query.get(roles_id)
         if not role:
             return jsonify({"error": "Role not found"}), 404
             
@@ -81,10 +83,10 @@ def update_role(id_role):
     
 # ==================== Role DELETE Controller ====================
 
-def delete_role(id_role):
+def delete_role(roles_id):
     """Delete a role"""
     try:
-        role = Role.query.get(id_role)
+        role = Role.query.get(roles_id)
         if not role:
             return jsonify({"error": "Role not found"}), 404
             
