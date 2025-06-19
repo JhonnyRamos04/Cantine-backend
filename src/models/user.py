@@ -9,6 +9,8 @@ class User(db.Model):
     email = db.Column(db.Text, unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
     roles_id = db.Column(db.UUID, db.ForeignKey('roles.roles_id'), nullable=False)
+
+    orders = db.relationship('Orders', back_populates='user', lazy=True)
     
     def __repr__(self):
         return f'<User id={self.user_id}, name={self.name}, email={self.email}>'

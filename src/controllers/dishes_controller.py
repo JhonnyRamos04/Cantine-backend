@@ -7,7 +7,6 @@ def get_dishes():
     try:
         # Usar opciones de carga para cargar relaciones
         all_dishes = Dish.query.options(
-            db.joinedload(Dish.status),
             db.joinedload(Dish.category),
             db.joinedload(Dish.product)
         ).all()
@@ -21,7 +20,6 @@ def get_dish_by_id(dishes_id):
     try:
         # Usar opciones de carga para cargar relaciones
         dish = Dish.query.options(
-            db.joinedload(Dish.status),
             db.joinedload(Dish.category),
             db.joinedload(Dish.product)
         ).get(dishes_id)
@@ -40,14 +38,7 @@ def get_dishes_by_category(category_id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-def get_dishes_by_status(status_id):
-    """Get dishes by status ID"""
-    try:
-        dishes = Dish.query.filter_by(status_id=status_id).all()
-        dishes_list = [d.to_dict() for d in dishes]
-        return jsonify(dishes_list)
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+
 
 # ==================== Dish POST Controller ====================
 
@@ -64,9 +55,9 @@ def create_dish():
         new_dish = Dish(
             dishes_id=uuid.uuid4(),
             name=data['name'],
-            status_id=data.get('status_id'),
             category_id=data.get('category_id'),
-            products_id=data.get('products_id')
+            products_id=data.get('products_id'),
+            price=data['price']
         )
         
         # Add to database
@@ -98,12 +89,12 @@ def update_dish(dishes_id):
         # Update fields if provided
         if 'name' in data:
             dish.name = data['name']
-        if 'status_id' in data:
-            dish.status_id = data['status_id']
         if 'category_id' in data:
             dish.category_id = data['category_id']
         if 'products_id' in data:
             dish.products_id = data['products_id']
+        if 'price' in data:
+            dish.price = data['price']
             
         db.session.commit()
         

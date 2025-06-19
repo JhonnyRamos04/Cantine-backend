@@ -8,7 +8,7 @@ class Status(db.Model):
     description = db.Column(db.Text)
     
     # Relaciones
-    dishes = db.relationship('Dish', back_populates='status', lazy=True)
+    orders = db.relationship('Orders', back_populates='status', lazy=True)
 
     def __repr__(self):
         return f'<Status id={self.status_id}, name={self.name}>'

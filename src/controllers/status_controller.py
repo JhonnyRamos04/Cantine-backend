@@ -90,7 +90,7 @@ def delete_status(status_id):
             return jsonify({"error": "Status not found"}), 404
             
         # Check if status is being used
-        if status.dishes:
+        if status.orders:
             return jsonify({"error": "Cannot delete status that is in use"}), 400
             
         db.session.delete(status)

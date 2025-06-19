@@ -1,5 +1,5 @@
 from flask import Blueprint
-from src.controllers.dishes_controller import delete_dish, get_dishes, get_dish_by_id, get_dishes_by_category, get_dishes_by_status, create_dish, update_dish
+from src.controllers.dishes_controller import delete_dish, get_dishes, get_dish_by_id, get_dishes_by_category, create_dish, update_dish
 
 dish_bp = Blueprint('dish', __name__)
 
@@ -14,10 +14,6 @@ def dish_by_id(dishes_id):
 @dish_bp.route('/category/<uuid:category_id>', methods=['GET'])
 def dishes_by_category(category_id):
     return get_dishes_by_category(category_id)
-
-@dish_bp.route('/status/<uuid:status_id>', methods=['GET'])
-def dishes_by_status(status_id):
-    return get_dishes_by_status(status_id)
 
 @dish_bp.route('/', methods=['POST'])
 def add_dish():

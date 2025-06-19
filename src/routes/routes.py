@@ -6,7 +6,7 @@ from src.routes.category_routes import category_bp
 from src.routes.providers_routes import provider_bp
 from src.routes.product_detail_routes import product_detail_bp
 from src.routes.product_routes import product_bp
-from src.routes.dishes_detail_routes import dish_detail_bp
+from src.routes.orders_route import orders_bp
 from src.routes.dishes_routes import dish_bp
 from src.routes.material_detail_routes import material_detail_bp
 from src.routes.material_routes import material_bp
@@ -38,7 +38,7 @@ def register_routes(app):
     app.register_blueprint(provider_bp, url_prefix='/providers')
     app.register_blueprint(product_detail_bp, url_prefix='/product-details')
     app.register_blueprint(product_bp, url_prefix='/products')
-    app.register_blueprint(dish_detail_bp, url_prefix='/dish-details')
+    app.register_blueprint(orders_bp, url_prefix='/orders')
     app.register_blueprint(dish_bp, url_prefix='/dishes')
     app.register_blueprint(material_detail_bp, url_prefix='/material-details')
     app.register_blueprint(material_bp, url_prefix='/materials')

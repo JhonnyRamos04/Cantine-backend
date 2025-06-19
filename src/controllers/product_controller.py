@@ -64,7 +64,6 @@ def get_products():
                     dishes_list.append({
                         'dishes_id': str(dish.dishes_id),
                         'name': dish.name,
-                        'status_id': str(dish.status_id) if dish.status_id else None
                     })
                 product_dict['dishes'] = dishes_list
                 product_dict['dishes_count'] = len(dishes_list)
@@ -136,7 +135,6 @@ def get_product_by_id(products_id):
                 dishes_list.append({
                     'dishes_id': str(dish.dishes_id),
                     'name': dish.name,
-                    'status_id': str(dish.status_id) if dish.status_id else None
                 })
             product_dict['dishes'] = dishes_list
             product_dict['dishes_count'] = len(dishes_list)

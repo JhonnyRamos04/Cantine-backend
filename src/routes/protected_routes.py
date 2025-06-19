@@ -10,7 +10,7 @@ from src.controllers.category_controller import create_category
 from src.controllers.provider_controller import create_provider
 from src.controllers.product_detail_controller import create_product_detail
 from src.controllers.product_controller import create_product
-from src.controllers.dishes_detail_controller import create_dish_detail
+from src.controllers.orders_controller import create_order
 from src.controllers.dishes_controller import create_dish
 from src.controllers.material_detail_controller import create_material_detail
 from src.controllers.material_controller import create_material
@@ -58,7 +58,7 @@ def add_dish():
 @protected_bp.route('/dish-details', methods=['POST'])
 @role_required(['1', '2'])  # Este decorador ahora permite acceso a todos
 def add_dish_detail():
-    return create_dish_detail()
+    return create_order()
 
 @protected_bp.route('/providers', methods=['POST'])
 @role_required(['1', '2'])  # Este decorador ahora permite acceso a todos
