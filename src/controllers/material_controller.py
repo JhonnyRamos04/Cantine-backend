@@ -1,33 +1,142 @@
 from flask import jsonify, request
+from sqlalchemy.orm import joinedload
 from src.models.material import Material, db
+from src.models.material_detail import MaterialDetail
 import uuid
 
 def get_materials():
-    """Get all materials"""
+    """Get all materials with their details and providers"""
     try:
-        all_materials = Material.query.all()
-        materials_list = [m.to_dict() for m in all_materials]
+        # Eagerly load the 'material_detail' and the nested 'provider'
+        all_materials = Material.query.options(
+            joinedload(Material.material_detail).joinedload(MaterialDetail.provider)
+        ).all()
+        
+        materials_list = []
+        for material in all_materials:
+            material_data = {
+                'materials_id': str(material.materials_id),
+                'name': material.name,
+                'type_id': material.type_id,
+                'type_name': material.get_type_name(),
+                'materials_details_id': str(material.materials_details_id) if material.materials_details_id else None,
+                'material_detail': None
+            }
+            
+            if material.material_detail:
+                material_detail_data = {
+                    'materials_details_id': str(material.material_detail.materials_details_id),
+                    'description': material.material_detail.description,
+                    'quantity': material.material_detail.quantity,
+                    'price': float(material.material_detail.price) if material.material_detail.price else None,
+                    'provider': None
+                }
+                
+                if material.material_detail.provider:
+                    material_detail_data['provider'] = {
+                        'provider_id': str(material.material_detail.provider.provider_id),
+                        'name': material.material_detail.provider.name,
+                        'direction': material.material_detail.provider.direction,
+                        'phone': material.material_detail.provider.phone
+                    }
+                
+                material_data['material_detail'] = material_detail_data
+            
+            materials_list.append(material_data)
+            
         return jsonify(materials_list)
     except Exception as e:
+        print(f"Error in get_materials: {e}")
         return jsonify({"error": str(e)}), 500
 
 def get_material_by_id(materials_id):
-    """Get a material by ID"""
+    """Get a material by ID with details"""
     try:
-        material = Material.query.get(materials_id)
-        if material:
-            return jsonify(material.to_dict())
-        return jsonify({"message": "Material not found"}), 404
+        # Eagerly load details
+        material = Material.query.options(
+            joinedload(Material.material_detail).joinedload(MaterialDetail.provider)
+        ).get(materials_id)
+
+        if not material:
+            return jsonify({"message": "Material not found"}), 404
+
+        material_data = {
+            'materials_id': str(material.materials_id),
+            'name': material.name,
+            'type_id': material.type_id,
+            'type_name': material.get_type_name(),
+            'materials_details_id': str(material.materials_details_id) if material.materials_details_id else None,
+            'material_detail': None
+        }
+        
+        if material.material_detail:
+            material_detail_data = {
+                'materials_details_id': str(material.material_detail.materials_details_id),
+                'description': material.material_detail.description,
+                'quantity': material.material_detail.quantity,
+                'price': float(material.material_detail.price) if material.material_detail.price else None,
+                'provider': None
+            }
+            
+            if material.material_detail.provider:
+                material_detail_data['provider'] = {
+                    'provider_id': str(material.material_detail.provider.provider_id),
+                    'name': material.material_detail.provider.name,
+                    'direction': material.material_detail.provider.direction,
+                    'phone': material.material_detail.provider.phone
+                }
+            
+            material_data['material_detail'] = material_detail_data
+
+        return jsonify(material_data)
+        
     except Exception as e:
+        print(f"Error in get_material_by_id: {e}")
         return jsonify({"error": str(e)}), 500
 
 def get_materials_by_type(type_id):
-    """Get materials by type ID"""
+    """Get materials by type ID with details"""
     try:
-        materials = Material.query.filter_by(type_id=type_id).all()
-        materials_list = [m.to_dict() for m in materials]
+        materials = Material.query.options(
+            joinedload(Material.material_detail).joinedload(MaterialDetail.provider)
+        ).filter_by(type_id=type_id).all()
+        
+        materials_list = []
+        for material in materials:
+            material_data = {
+                'materials_id': str(material.materials_id),
+                'name': material.name,
+                'type_id': material.type_id,
+                'type_name': material.get_type_name(),
+                'materials_details_id': str(material.materials_details_id) if material.materials_details_id else None,
+                'material_detail': None
+            }
+            
+            if material.material_detail:
+                material_detail_data = {
+                    'materials_details_id': str(material.material_detail.materials_details_id),
+                    'description': material.material_detail.description,
+                    'quantity': material.material_detail.quantity,
+                    'price': float(material.material_detail.price) if material.material_detail.price else None,
+                    'provider': None
+                }
+                
+                if material.material_detail.provider:
+                    material_detail_data['provider'] = {
+                        'provider_id': str(material.material_detail.provider.provider_id),
+                        'name': material.material_detail.provider.name,
+                        'direction': material.material_detail.provider.direction,
+                        'phone': material.material_detail.provider.phone
+                    }
+                
+                material_data['material_detail'] = material_detail_data
+            
+            materials_list.append(material_data)
+        
         return jsonify(materials_list)
+
     except Exception as e:
+        print(f"Error in get_materials_by_type: {e}")
         return jsonify({"error": str(e)}), 500
 
 # ==================== Material POST Controller ====================
@@ -37,11 +146,9 @@ def create_material():
     try:
         data = request.get_json()
         
-        # Validate required fields
         if not data or 'name' not in data:
             return jsonify({"error": "Name is required"}), 400
                 
-        # Create new material
         new_material = Material(
             materials_id=uuid.uuid4(),
             name=data['name'],
@@ -49,7 +156,6 @@ def create_material():
             materials_details_id=data.get('materials_details_id')
         )
         
-        # Add to database
         db.session.add(new_material)
         db.session.commit()
         
@@ -75,7 +181,6 @@ def update_material(materials_id):
         if not data:
             return jsonify({"error": "No data provided"}), 400
             
-        # Update fields if provided
         if 'name' in data:
             material.name = data['name']
         if 'type_id' in data:

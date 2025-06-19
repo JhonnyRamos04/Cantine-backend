@@ -13,7 +13,7 @@ def register():
     return register_user()
 
 @auth_bp.route('/login', methods=['POST'])
-@cross_origin(origins=["http://localhost:3000", "https://tuaplicacion.com"])
+@cross_origin(origins=["http://localhost:5173", "https://tuaplicacion.com"])
 def login():
     return login_user()
 

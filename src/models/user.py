@@ -21,6 +21,7 @@ class User(db.Model):
     
     def check_password(self, password):
         """Verifica si la contraseña proporcionada coincide con la almacenada"""
+        # Asegurarse de usar el mismo método de hash
         return check_password_hash(self.password, password)
     
     def to_dict(self):

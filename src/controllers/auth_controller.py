@@ -43,7 +43,7 @@ def register_user():
         return jsonify({
             "message": "User registered successfully",
             "user": new_user.to_dict(),
-            "access_token": access_token,
+            "access_token": access_token,  # Cambiado a singular
             "refresh_token": refresh_token
         }), 201
         
@@ -72,7 +72,7 @@ def login_user():
         return jsonify({
             "message": "Login successful",
             "user": user.to_dict(),
-            "access_token": access_token,
+            "access_token": access_token,  # Cambiado a singular
             "refresh_token": refresh_token
         }), 200
         
@@ -87,7 +87,7 @@ def refresh_token():
         access_token = "test_access_token_refreshed"
         
         return jsonify({
-            "access_token": access_token
+            "access_token": access_token  # Cambiado a singular
         }), 200
         
     except Exception as e:

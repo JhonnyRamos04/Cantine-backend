@@ -39,38 +39,7 @@ def add_status():
 def add_role():
     return create_role()
 
-@protected_bp.route('/categories', methods=['POST'])
-@admin_required()  # Este decorador ahora permite acceso a todos
-def add_category():
-    return create_category()
-
 @protected_bp.route('/users', methods=['POST'])
 @admin_required()  # Este decorador ahora permite acceso a todos
 def add_user():
     return create_user()
-
-# Rutas que requieren roles específicos - AHORA ACCESIBLES SIN AUTENTICACIÓN
-@protected_bp.route('/dishes', methods=['POST'])
-@role_required(['1', '2'])  # Este decorador ahora permite acceso a todos
-def add_dish():
-    return create_dish()
-
-@protected_bp.route('/dish-details', methods=['POST'])
-@role_required(['1', '2'])  # Este decorador ahora permite acceso a todos
-def add_dish_detail():
-    return create_order()
-
-@protected_bp.route('/providers', methods=['POST'])
-@role_required(['1', '2'])  # Este decorador ahora permite acceso a todos
-def add_provider():
-    return create_provider()
-
-@protected_bp.route('/materials', methods=['POST'])
-@role_required(['1', '2', '3'])  # Este decorador ahora permite acceso a todos
-def add_material():
-    return create_material()
-
-@protected_bp.route('/material-details', methods=['POST'])
-@role_required(['1', '2', '3'])  # Este decorador ahora permite acceso a todos
-def add_material_detail():
-    return create_material_detail()
