@@ -7,7 +7,8 @@ class Dish(db.Model):
     name = db.Column(db.Text, nullable=False)
     category_id = db.Column(db.UUID, db.ForeignKey('category.category_id'))
     products_id = db.Column(db.UUID, db.ForeignKey('products.products_id'))
-    price=db.Column(db.Text)
+    price = db.Column(db.Text)
+    img = db.Column(db.Text) # Nuevo campo img
     
     # Relaciones
     
@@ -24,5 +25,6 @@ class Dish(db.Model):
             'name': self.name,
             'category_id': str(self.category_id) if self.category_id else None,
             'products_id': str(self.products_id) if self.products_id else None,
-            'price':self.price
+            'price': self.price,
+            'img': self.img # Incluir img en la representación del diccionario
         }
